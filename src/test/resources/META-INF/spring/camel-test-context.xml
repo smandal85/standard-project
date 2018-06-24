@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="
+         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+         http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+
+    <import resource="spring-security-test-context.xml"/>
+
+    <!-- This implicitly enables the auto scan feature-->
+    <context:component-scan base-package="com.backbase.recruitment"/>
+
+    <!-- Enable trace if it's need to debug the routes -->
+    <camelContext trace="false" id="camel" xmlns="http://camel.apache.org/schema/spring">
+        <!-- Scan for the Camel Route Builders -->
+        <packageScan>
+            <package>com.backbase.recruitment</package>
+        </packageScan>
+        <!-- This configuration is made on the RouteBuilder -->
+        <!--<restConfiguration component="servlet" bindingMode="auto"/>-->
+    </camelContext>
+
+    <!-- Properties Placeholder for Camel, use {{ }} -->
+    <bean id="properties" class="org.apache.camel.component.properties.PropertiesComponent">
+        <property name="location" value="classpath:placeholder.properties"/>
+    </bean>
+</beans>

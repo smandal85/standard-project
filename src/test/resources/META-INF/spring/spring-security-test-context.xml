@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:security="http://www.springframework.org/schema/security"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+         http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd
+         http://camel.apache.org/schema/spring-security http://camel.apache.org/schema/spring-security/camel-spring-security.xsd">
+
+    <!-- Basic Spring Security Config -->
+    <security:http use-expressions="true" realm="User Restrict Realm">
+        <security:intercept-url pattern="/filter*" access="hasRole('ROLE_USER')" />
+        <security:intercept-url pattern="/transactions*" access="permitAll" />
+        <security:intercept-url pattern="/totalAmount*" access="hasRole('ROLE_ADMIN')" />
+        <security:http-basic/>
+    </security:http>
+
+    <!--  set up the user configuration here -->
+    <security:authentication-manager alias="authenticationManager">
+        <security:authentication-provider user-service-ref="userDetailsService"/>
+    </security:authentication-manager>
+
+    <security:user-service id="userDetailsService">
+        <security:user name="admin" password="admin" authorities="ROLE_USER, ROLE_ADMIN"/>
+        <security:user name="user" password="user" authorities="ROLE_USER"/>
+    </security:user-service>
+
+    <authorizationPolicy id="admin" access="ROLE_ADMIN"
+                         authenticationManager="authenticationManager"
+                         accessDecisionManager="accessDecisionManager"
+                         xmlns="http://camel.apache.org/schema/spring-security"/>
+
+    <authorizationPolicy id="user" access="ROLE_USER"
+                         xmlns="http://camel.apache.org/schema/spring-security"/>
+
+    <bean id="accessDecisionManager" class="org.springframework.security.access.vote.AffirmativeBased">
+        <constructor-arg>
+            <bean class="org.springframework.security.access.vote.RoleVoter"/>
+        </constructor-arg>
+        <property name="allowIfAllAbstainDecisions" value="true"/>
+    </bean>
+
+</beans>
